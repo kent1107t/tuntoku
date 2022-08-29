@@ -1,12 +1,12 @@
 {
   "files": {
-    "main.js": "/tuntoku/static/js/main.b5e9eceb.js",
+    "main.js": "/tuntoku/static/js/main.26493a47.js",
     "static/js/787.027aface.chunk.js": "/tuntoku/static/js/787.027aface.chunk.js",
     "index.html": "/tuntoku/index.html",
-    "main.b5e9eceb.js.map": "/tuntoku/static/js/main.b5e9eceb.js.map",
+    "main.26493a47.js.map": "/tuntoku/static/js/main.26493a47.js.map",
     "787.027aface.chunk.js.map": "/tuntoku/static/js/787.027aface.chunk.js.map"
   },
   "entrypoints": [
-    "static/js/main.b5e9eceb.js"
+    "static/js/main.26493a47.js"
   ]
 }
