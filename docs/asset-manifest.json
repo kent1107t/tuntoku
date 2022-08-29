@@ -1,16 +1,12 @@
 {
   "files": {
-    "main.css": "/tuntoku/static/css/main.073c9b0a.css",
-    "main.js": "/tuntoku/static/js/main.e7fae7ae.js",
+    "main.js": "/tuntoku/static/js/main.b5e9eceb.js",
     "static/js/787.027aface.chunk.js": "/tuntoku/static/js/787.027aface.chunk.js",
-    "static/media/logo.svg": "/tuntoku/static/media/logo.6ce24c58023cc2f8fd88fe9d219db6c6.svg",
     "index.html": "/tuntoku/index.html",
-    "main.073c9b0a.css.map": "/tuntoku/static/css/main.073c9b0a.css.map",
-    "main.e7fae7ae.js.map": "/tuntoku/static/js/main.e7fae7ae.js.map",
+    "main.b5e9eceb.js.map": "/tuntoku/static/js/main.b5e9eceb.js.map",
     "787.027aface.chunk.js.map": "/tuntoku/static/js/787.027aface.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.073c9b0a.css",
-    "static/js/main.e7fae7ae.js"
+    "static/js/main.b5e9eceb.js"
   ]
 }
