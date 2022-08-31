@@ -9,12 +9,35 @@ import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { render } from "@testing-library/react";
+import { Link } from "@mui/material";
 
+
+function isUrl(suspect: string) : boolean {
+    // URLかどうかを判定する 参考↓
+    // https://www.megasoft.co.jp/mifes/seiki/s310.html
+    const pattern = new RegExp('https?://[\\w/:%#\\$&\\?\\(\\)~\\.=\\+\\-]+');
+    return pattern.test(suspect);
+}
+
+function LinkFormatted(urlOrNot: string) {
+    // URLであればリンクを有効にして返す
+    if (isUrl(urlOrNot))
+        return (
+            <Link href={urlOrNot} color="inherit" underline="hover" target="_blank" rel="noopener noreferrer">
+                {urlOrNot}
+            </Link>
+        );
+    else
+        return (
+            <Link tabIndex={-1} color="inherit" underline="hover" target="_blank" rel="noopener noreferrer">
+                {urlOrNot}
+            </Link>
+        );
+}
 
 export type Problem = {
     url: string
 }
-
 type Props = { 
     groupName: string
     problems: Problem[]
@@ -34,14 +57,16 @@ export const ProblemCards: React.FC<Props> = ({ problems, groupName, handleRemov
                         >
                             <CardContent sx={{ flexGrow: 1 }}>
                                 <Typography gutterBottom variant="h5" component="h2">
-                                    {problem.url}
+                                    {LinkFormatted(problem.url)}
                                 </Typography>
                                 <Typography>
                                     説明文
                                 </Typography>
                             </CardContent>
                             <CardActions>
+                                {/*
                                 <Button size="small">View</Button>
+                                */}
                                 <Button
                                     size="small"
                                     onClick={() => handleRemove(groupName, problem.url)}

@@ -47,7 +47,6 @@ export default function App() {
     return;
   }
 
-
   const removeProblem = (groupNameForRemove: string, urlForRemove: string) => {
     // 引数のurlを、今のグループの問題から削除する
     // まずは問題のリストから削除
