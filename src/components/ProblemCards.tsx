@@ -35,16 +35,18 @@ function LinkFormatted(urlOrNot: string) {
         );
 }
 
+
 export type Problem = {
     url: string
 }
 type Props = { 
     groupName: string
     problems: Problem[]
-    handleRemove: (groupName: string, url: string) => void
+    handleSolve: (url: string, groupName: string) => void
+    handleDelete: (url: string, groupName: string) => void
  }
 
-export const ProblemCards: React.FC<Props> = ({ problems, groupName, handleRemove }) => {
+export const ProblemCards: React.FC<Props> = ({ problems, groupName, handleSolve, handleDelete }) => {
     return (
         <Container sx={{ py: 8 }} maxWidth="md">
             {/* End hero unit */}
@@ -64,14 +66,14 @@ export const ProblemCards: React.FC<Props> = ({ problems, groupName, handleRemov
                                 </Typography>
                             </CardContent>
                             <CardActions>
-                                {/*
-                                <Button size="small">View</Button>
-                                */}
-                                <Button
-                                    size="small"
-                                    onClick={() => handleRemove(groupName, problem.url)}
-                                >
-                                    削除
+                                <Button size="small" onClick={() => handleSolve(problem.url, groupName)}>
+                                    SOLVED
+                                </Button>
+                                <Button size="small" color="secondary">
+                                    LATER
+                                </Button>
+                                <Button size="small" onClick={() => handleDelete(problem.url, groupName)} color="error">
+                                    DELETE
                                 </Button>
                             </CardActions>
                         </Card>
