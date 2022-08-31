@@ -18,10 +18,10 @@ export type Problem = {
 type Props = { 
     groupName: string
     problems: Problem[]
-    
+    handleRemove: (groupName: string, url: string) => void
  }
 
-export const ProblemCards: React.FC<Props> = ({ problems, groupName }) => {
+export const ProblemCards: React.FC<Props> = ({ problems, groupName, handleRemove }) => {
     return (
         <Container sx={{ py: 8 }} maxWidth="md">
             {/* End hero unit */}
@@ -42,7 +42,12 @@ export const ProblemCards: React.FC<Props> = ({ problems, groupName }) => {
                             </CardContent>
                             <CardActions>
                                 <Button size="small">View</Button>
-                                <Button size="small">Edit</Button>
+                                <Button
+                                    size="small"
+                                    onClick={() => handleRemove(groupName, problem.url)}
+                                >
+                                    削除
+                                </Button>
                             </CardActions>
                         </Card>
                     </Grid>
