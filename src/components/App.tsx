@@ -1,88 +1,12 @@
 import { Component, useState } from 'react';
 import * as React from 'react';
-import AppBar from '@mui/material/AppBar';
-import CssBaseline from '@mui/material/CssBaseline';
-import Stack from '@mui/material/Stack';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
-import Link from '@mui/material/Link';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import OverallStructure from './OverallStructure';
 import Form from './Form';
 import {Problem, ProblemCards} from './ProblemCards';
 import { group } from 'console';
 
 
-function BarTitle() {
-  return (
-    <AppBar position="relative">
-      {/* 上部のバー */}
-      <Toolbar>
-        {/* 
-        <CameraIcon sx={{ mr: 2 }} />
-        */}
-        <Typography variant="h6" color="inherit" noWrap>
-          {document.title}
-        </Typography>
-      </Toolbar>
-    </AppBar>
-  );
-}
-function TextPrimary() {
-  return (
-    <Typography
-      component="h1"
-      variant="h2"
-      align="center"
-      color="text.primary"
-      gutterBottom
-    >
-      {document.title}
-    </Typography>
-  );
-}
-function TextSecondary() {
-  return (
-    <Typography variant="h5" align="center" color="text.secondary" paragraph>
-      URLを入力してエンターを押すと、その問題を積んでおきます。
-    </Typography>
-  );
-}
-function Copyright() {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center">
-      {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
-function Footer() {
-  return (
-    <Box sx={{ bgcolor: 'background.paper', p: 6 }} component="footer">
-      <Typography variant="h6" align="center" gutterBottom>
-        Footer
-      </Typography>
-      <Typography
-        variant="subtitle1"
-        align="center"
-        color="text.secondary"
-        component="p"
-      >
-        Something here to give the footer a purpose!
-      </Typography>
-      <Copyright />
-    </Box>
-  );
-}
-
-
-const theme = createTheme();
-const initialGroupName: string = "Initial Group";
+const initialGroupName: string = "Initial Group"; // はじめにあるグループ
 
 export default function App() {
   const [currentGroupName, setCurrentGroupName] = useState<string>(initialGroupName);
@@ -97,7 +21,7 @@ export default function App() {
   type CheckAndAlertIfUrlExists = (url: string) => boolean;
   const checkAndAlertIfUrlExists: CheckAndAlertIfUrlExists = (url: string) => {
     if (groupName2setUrls[currentGroupName].has(url)) {
-      alert('exist!');
+      alert('入力されたURLはすでに存在しています!');
       return true;
     }
     return false;
@@ -116,7 +40,6 @@ export default function App() {
     // 今のグループの問題の集合に、今回の問題を追加する
     groupName2setUrls[currentGroupName].add(urlForPiledUp);
     setGroupName2setUrls(groupName2setUrls);
-    console.log(groupName2setUrls[currentGroupName].entries());
     /*  イテレータの機能をオンにする必要があったので、問題の集合は変更を検知してrenderしなおす必要がないから上のようにそのまま追加することにした
     setGroupName2setProblems({ ...groupName2setProblems,
       [currentGroupName]: new Set([ ...groupName2setProblems[currentGroupName], problemForPiledUp ])})
@@ -133,42 +56,12 @@ export default function App() {
     // 次に問題の集合から削除
     groupName2setUrls[groupNameForRemove].delete(urlForRemove);
     setGroupName2setUrls(groupName2setUrls);
-    /*
-    setProblems(
-      urls.filter((url, index) => (index !== i))
-    );
-    */
   }
   
-
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <BarTitle />
-      <main>
-        {/* 本体のところ Hero unit */}
-        <Box
-          sx={{
-            bgcolor: 'background.paper',
-            pt: 8,
-            pb: 6,
-          }}
-        >
-          <Container maxWidth="sm">
-            {/* 表紙みたいなところ */}
-            <TextPrimary />
-            <TextSecondary />
-            {/* 入力フォーム */}
-            <Form pileUpProblem={pileUpProblem} />
-          </Container>
-        </Box>
-        
-        {/* 問題のカードたち */}
-        <ProblemCards groupName={currentGroupName} problems={groupName2problems[currentGroupName]} handleRemove={removeProblem} />
-      </main>
-      {/* Footer */}
-      <Footer />
-      {/* End footer */}
-    </ThemeProvider>
+    OverallStructure(
+      <Form pileUpProblem={pileUpProblem} />,
+      <ProblemCards groupName={currentGroupName} problems={groupName2problems[currentGroupName]} handleRemove={removeProblem} />
+    )
   );
 }
