@@ -70,6 +70,14 @@ export default function App() {
     });
   }
 
+  const laterProblem = (urlForLater: string, groupNameForLater: string) => {
+    // 指定したurlを、そのグループ内での末尾に移動
+    const problemForLater: Problem = {url: urlForLater};
+    setGroupName2Problems({ ...groupName2problems,
+      [groupNameForLater]: [ ...groupName2problems[groupNameForLater].filter((problem, _) => (problem.url !== urlForLater)), problemForLater ]
+    });
+  }
+
   const deleteProblem = (urlForDelete: string, groupNameForDelete: string) => {
     // 引数のurlを、今のグループの問題から削除する
     // まずは問題のリストから削除
@@ -88,6 +96,7 @@ export default function App() {
         groupName={currentGroupName}
         problems={groupName2problems[currentGroupName]}
         handleSolve={solveProblem}
+        handleLater={laterProblem}
         handleDelete={deleteProblem}
       />
     )

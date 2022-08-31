@@ -43,10 +43,11 @@ type Props = {
     groupName: string
     problems: Problem[]
     handleSolve: (url: string, groupName: string) => void
+    handleLater: (url: string, groupName: string) => void
     handleDelete: (url: string, groupName: string) => void
  }
 
-export const ProblemCards: React.FC<Props> = ({ problems, groupName, handleSolve, handleDelete }) => {
+export const ProblemCards: React.FC<Props> = ({ problems, groupName, handleSolve, handleLater, handleDelete }) => {
     return (
         <Container sx={{ py: 8 }} maxWidth="md">
             {/* End hero unit */}
@@ -69,7 +70,7 @@ export const ProblemCards: React.FC<Props> = ({ problems, groupName, handleSolve
                                 <Button size="small" onClick={() => handleSolve(problem.url, groupName)}>
                                     SOLVED
                                 </Button>
-                                <Button size="small" color="secondary">
+                                <Button size="small" onClick={() => handleLater(problem.url, groupName)} color="secondary">
                                     LATER
                                 </Button>
                                 <Button size="small" onClick={() => handleDelete(problem.url, groupName)} color="error">
