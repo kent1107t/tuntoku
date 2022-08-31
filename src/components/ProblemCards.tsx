@@ -10,18 +10,29 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { render } from "@testing-library/react";
 import { Link } from "@mui/material";
+import TitleAndStatementOfAllProblem from '../scraper/title_and_statement_of_all_problem.json';
+//import { url } from "inspector";
 
+// 参考 : https://www.i-ryo.com/entry/2020/11/20/081558
+const titleAndStatementOfAllProblem: {[url: string]: {title: string, problemStatement: string}} = TitleAndStatementOfAllProblem;
 
 function isUrl(suspect: string) : boolean {
     // URLかどうかを判定する 参考↓
     // https://www.megasoft.co.jp/mifes/seiki/s310.html
     const pattern = new RegExp('https?://[\\w/:%#\\$&\\?\\(\\)~\\.=\\+\\-]+');
+    //if (suspect in titleAndStatementOfAllProblem)  return true;
     return pattern.test(suspect);
 }
 
 function LinkFormatted(urlOrNot: string) {
-    // URLであればリンクを有効にして返す
-    if (isUrl(urlOrNot))
+    /* URLであればリンクを有効にして返す */
+    if (urlOrNot in titleAndStatementOfAllProblem)
+        return (
+            <Link href={urlOrNot} color="inherit" underline="hover" target="_blank" rel="noopener noreferrer">
+                {titleAndStatementOfAllProblem[urlOrNot].title}
+            </Link>
+        )
+    else if (isUrl(urlOrNot))
         return (
             <Link href={urlOrNot} color="inherit" underline="hover" target="_blank" rel="noopener noreferrer">
                 {urlOrNot}
@@ -33,6 +44,18 @@ function LinkFormatted(urlOrNot: string) {
                 {urlOrNot}
             </Link>
         );
+}
+
+function DescriptionProblem(urlOrNot: string) {
+    /* 問題のリンクとしてデータがあれば、その問題文を返す */
+    if (urlOrNot in titleAndStatementOfAllProblem)
+        return (<Typography>
+            {titleAndStatementOfAllProblem[urlOrNot].problemStatement}
+            </Typography>);
+    else
+        return (<Typography>
+            問題のURLは見つかりませんでした
+        </Typography>);
 }
 
 
@@ -62,9 +85,12 @@ export const ProblemCards: React.FC<Props> = ({ problems, groupName, handleSolve
                                 <Typography gutterBottom variant="h5" component="h2">
                                     {LinkFormatted(problem.url)}
                                 </Typography>
+                                {DescriptionProblem(problem.url)}
+                                {/*
                                 <Typography>
-                                    説明文
+                                    {DescriptionProblem(problem.url)}
                                 </Typography>
+                                */}
                             </CardContent>
                             <CardActions>
                                 <Button size="small" onClick={() => handleSolve(problem.url, groupName)}>

@@ -18,6 +18,8 @@ export default function App() {
   //const [ProblemCards, setProblemCards] = useState<ProblemCards[]>([]);
   //const [ProblemCardsReal, setProblemCardsReal] = useState<React.FC>(ProblemCards);
 
+  console.log(groupName2problems);
+
   function checkAndAlertIfUrlExists(url: string, groupName: string) : boolean {
     if (groupName2setUrls[groupName].has(url)) {
       alert('入力されたURLはすでに存在しています!');
@@ -29,7 +31,6 @@ export default function App() {
   const pileUpProblem = (urlForPiledUp: string, groupNameForPileUp: string = currentGroupName) => {   
     // もらったグループに、もらったurlを追加する
     //  Form の submit 関数が走るときに、その入力値を引数としてこの関数が呼ばれるようになってる
-    console.log("called pileUpProblem", urlForPiledUp, groupNameForPileUp);
     // すでに追加してないか確認（今は戻るようにしてるけど、あとで先頭に追加し直すようにするかも）
     if (checkAndAlertIfUrlExists(urlForPiledUp, groupNameForPileUp))  return;
     // まず、今回追加する単体のProblemを作る
@@ -39,7 +40,6 @@ export default function App() {
     // セットする新しい値も、今ある配列を展開して、それに追加する形で今回の問題を後ろにつける
     setGroupName2Problems({ ...groupName2problems,
       [groupNameForPileUp]: [ problemForPiledUp, ...groupName2problems[groupNameForPileUp] ] });
-    console.log({[groupNameForPileUp]: [ problemForPiledUp, ...groupName2problems[groupNameForPileUp] ]});
     // 今のグループの問題の集合に、今回の問題を追加する
     groupName2setUrls[groupNameForPileUp].add(urlForPiledUp);
     setGroupName2setUrls(groupName2setUrls);
@@ -81,7 +81,6 @@ export default function App() {
   const deleteProblem = (urlForDelete: string, groupNameForDelete: string) => {
     // 引数のurlを、今のグループの問題から削除する
     // まずは問題のリストから削除
-    console.log("called  deleteProblem", urlForDelete, groupNameForDelete);
     setGroupName2Problems({ ...groupName2problems,
       [groupNameForDelete]: groupName2problems[groupNameForDelete].filter((problem, index) => (problem.url !== urlForDelete))});
     // 次に問題の集合から削除
