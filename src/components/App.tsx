@@ -6,15 +6,16 @@ import {Problem, ProblemCards} from './ProblemCards';
 import { group } from 'console';
 
 
-const initialGroupName: string = "InitialGroup"; // 最初にセットされてるグループ
-const solvedGroupName:  string = "SolvedGroup"   // 解いた問題が行くグループ
+const initialGroupName: string = "initialGroup"; // 全体のグループ
+const allGroupName    : string = "AllGroup";     // 全体のグループ
+const solvedGroupName : string = "SolvedGroup"   // 解いた問題が行くグループ
 
 export default function App() {
   const [currentGroupName, setCurrentGroupName] = useState<string>(initialGroupName);
   // グループ名をキーとして、そのグループの問題の問題リストを値とした辞書
-  const [groupName2problems, setGroupName2Problems] = useState<{[GroupName: string]: Problem[]}>({[initialGroupName]: [], [solvedGroupName]: []});
+  const [groupName2problems, setGroupName2Problems] = useState<{[GroupName: string]: Problem[]}>({[allGroupName]: [], [solvedGroupName]: [], [initialGroupName]: []});
   // グループ名をキーとして、そのグループの問題の問題の集合を値とした辞書
-  const [groupName2setUrls, setGroupName2setUrls] = useState<{[GroupName: string]: Set<string>}>({[initialGroupName]: new Set(), [solvedGroupName]: new Set()});
+  const [groupName2setUrls, setGroupName2setUrls] = useState<{[GroupName: string]: Set<string>}>({[allGroupName]: new Set(), [solvedGroupName]: new Set(), [initialGroupName]: new Set()});
   //const [ProblemCards, setProblemCards] = useState<ProblemCards[]>([]);
   //const [ProblemCardsReal, setProblemCardsReal] = useState<React.FC>(ProblemCards);
 
@@ -29,7 +30,7 @@ export default function App() {
   } 
 
   const pileUpProblem = (urlForPiledUp: string, groupNameForPileUp: string = currentGroupName) => {   
-    // もらったグループに、もらったurlを追加する
+    /* もらったグループに、もらったurlを追加する */
     //  Form の submit 関数が走るときに、その入力値を引数としてこの関数が呼ばれるようになってる
     // すでに追加してないか確認（今は戻るようにしてるけど、あとで先頭に追加し直すようにするかも）
     if (checkAndAlertIfUrlExists(urlForPiledUp, groupNameForPileUp))  return;
@@ -39,9 +40,12 @@ export default function App() {
     // 今あるオブジェクトを展開し、↓でcurrentGroupNameの部分だけ新しい値をセット(キー名の部分を[]で囲まないと変数名がそのままキーになるので注意)
     // セットする新しい値も、今ある配列を展開して、それに追加する形で今回の問題を後ろにつける
     setGroupName2Problems({ ...groupName2problems,
-      [groupNameForPileUp]: [ problemForPiledUp, ...groupName2problems[groupNameForPileUp] ] });
+      [groupNameForPileUp]: [ problemForPiledUp, ...groupName2problems[groupNameForPileUp] ],
+      [allGroupName]      : [ problemForPiledUp, ...groupName2problems[allGroupName]]
+    });
     // 今のグループの問題の集合に、今回の問題を追加する
     groupName2setUrls[groupNameForPileUp].add(urlForPiledUp);
+    groupName2setUrls[allGroupName].add(urlForPiledUp);
     setGroupName2setUrls(groupName2setUrls);
     /*  イテレータの機能をオンにする必要があったので、問題の集合は変更を検知してrenderしなおす必要がないから上のようにそのまま追加することにした
     setGroupName2setProblems({ ...groupName2setProblems,
@@ -58,20 +62,22 @@ export default function App() {
       deleteProblem(urlForSolve, groupNameForSolve);
       return;
     }
-    // urlの集合に関して、もとのグループの集合から消去し、解決済みのグループに追加し、更新する
+    // urlの集合に関して、もとのグループと全体の集合から消去し、解決済みのグループに追加し、更新する
     groupName2setUrls[groupNameForSolve].delete(urlForSolve);
+    groupName2setUrls[allGroupName].delete(urlForSolve);
     groupName2setUrls[solvedGroupName].add(urlForSolve);
     setGroupName2setUrls(groupName2setUrls);
     // 問題のリストに関して、それぞれを消去・追加し更新する
     const problemForSolve: Problem = {url: urlForSolve};
     setGroupName2Problems({ ...groupName2problems, 
       [groupNameForSolve] : groupName2problems[groupNameForSolve].filter((problem, index) => (problem.url !== urlForSolve)),
-      [solvedGroupName] : [ problemForSolve, ...groupName2problems[solvedGroupName] ]
+      [allGroupName]      : groupName2problems[allGroupName].filter((problem, index) => (problem.url !== urlForSolve)),
+      [solvedGroupName]   : [ problemForSolve, ...groupName2problems[solvedGroupName] ]
     });
   }
 
   const laterProblem = (urlForLater: string, groupNameForLater: string) => {
-    // 指定したurlを、そのグループ内での末尾に移動
+    /* 指定したurlを、そのグループ内での末尾に移動 */
     const problemForLater: Problem = {url: urlForLater};
     setGroupName2Problems({ ...groupName2problems,
       [groupNameForLater]: [ ...groupName2problems[groupNameForLater].filter((problem, _) => (problem.url !== urlForLater)), problemForLater ]
@@ -79,12 +85,16 @@ export default function App() {
   }
 
   const deleteProblem = (urlForDelete: string, groupNameForDelete: string) => {
-    // 引数のurlを、今のグループの問題から削除する
-    // まずは問題のリストから削除
+    /* 引数のurlを、引数のグループの問題から削除する */
+    // まずは引数のグループと全体のグループの、問題リストから削除
     setGroupName2Problems({ ...groupName2problems,
-      [groupNameForDelete]: groupName2problems[groupNameForDelete].filter((problem, index) => (problem.url !== urlForDelete))});
-    // 次に問題の集合から削除
+      [groupNameForDelete]: groupName2problems[groupNameForDelete].filter((problem, index) => (problem.url !== urlForDelete)),
+            [allGroupName]: groupName2problems[allGroupName].filter((problem, index) => (problem.url !== urlForDelete)),
+    });
+    // 次に引数のグループと全体のグループの、問題の集合から削除
     groupName2setUrls[groupNameForDelete].delete(urlForDelete);
+    // solvedグループでこの関数が呼ばれた時、allGroupには入ってない可能性があるけど、無い要素をdeleteしようとしてもエラーにはならないみたいなので確認はしない今の所
+    groupName2setUrls[allGroupName].delete(urlForDelete);
     setGroupName2setUrls(groupName2setUrls);
   }
   
