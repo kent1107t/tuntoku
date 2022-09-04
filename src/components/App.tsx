@@ -1,25 +1,72 @@
+/* global gapi */
 import { Component, useState } from 'react';
 import * as React from 'react';
 import OverallStructure from './OverallStructure';
 import Form from './Form';
 import {Problem, ProblemCards} from './ProblemCards';
-import { group } from 'console';
+import { clear, group } from 'console';
+import {initialGroupName, allGroupName, solvedGroupName,
+        GroupName2problems, GroupName2setUrls, 
+        initialGroupName2Problems, initialGroupName2setUrls
+        } from '../save/TypesAndInitialData';
+import {KEYS, setLocalStrage, getLocalStorage, removeLocalStorage, clearLocalStorage} from '../save/LocalStorage';
 
+// TODO: AllGroup で削除をしたときにもとの属するグループでも消すかどうか
 
-const initialGroupName: string = "initialGroup"; // 全体のグループ
-const allGroupName    : string = "AllGroup";     // 全体のグループ
-const solvedGroupName : string = "SolvedGroup"   // 解いた問題が行くグループ
 
 export default function App() {
   const [currentGroupName, setCurrentGroupName] = useState<string>(initialGroupName);
   // グループ名をキーとして、そのグループの問題の問題リストを値とした辞書
-  const [groupName2problems, setGroupName2Problems] = useState<{[GroupName: string]: Problem[]}>({[allGroupName]: [], [solvedGroupName]: [], [initialGroupName]: []});
-  // グループ名をキーとして、そのグループの問題の問題の集合を値とした辞書
-  const [groupName2setUrls, setGroupName2setUrls] = useState<{[GroupName: string]: Set<string>}>({[allGroupName]: new Set(), [solvedGroupName]: new Set(), [initialGroupName]: new Set()});
+  const [groupName2problems, setGroupName2Problems] = useState<GroupName2problems>(initialGroupName2Problems);
+  // グループ名をキーとして、そのグループの問題の問題の集合を値とした辞書 (ProblemCardでkeyにURLを使ってるので、かぶらないかを確認するのに使ってる)
+  const [groupName2setUrls, setGroupName2setUrls] = useState<GroupName2setUrls>(initialGroupName2setUrls);
   //const [ProblemCards, setProblemCards] = useState<ProblemCards[]>([]);
   //const [ProblemCardsReal, setProblemCardsReal] = useState<React.FC>(ProblemCards);
 
   console.log(groupName2problems);
+
+  React.useEffect(() => {
+    // ページをロードした最初に一度だけ呼ばれる ローカルストレージに保存されてる問題を読み込む
+    //clearLocalStorage();
+
+    let savedGroupName2problems: GroupName2problems = getLocalStorage(KEYS.GROUPNAME2PROBLEMS),
+        savedGroupName2setUrls : GroupName2setUrls  = getLocalStorage(KEYS.GROUPNAME2SETURLS), 
+        savedCurrentGroupName: string = getLocalStorage(KEYS.CURRENTGROUPNAME);
+    /*
+    console.log("saved  ", savedGroupName2problems);
+    console.log("saved  ", savedGroupName2setUrls);
+    console.log("after  read   groupName2setUrls");
+    for (let [key, value] of Object.entries(savedGroupName2setUrls)) {
+      console.log('key = ', key, '  typeof(key) = ', typeof(key));
+      console.log('value = ', value, '  typeof(value) = ', value);
+    }
+    if (savedGroupName2problems === null)  savedGroupName2problems = initialGroupName2Problems;
+    if (savedGroupName2setUrls === null)   savedGroupName2setUrls  = initialGroupName2setUrls;
+    if (currentGroupName === null)  savedCurrentGroupName = initialGroupName;
+    */
+    setGroupName2Problems(savedGroupName2problems);
+    setGroupName2setUrls(savedGroupName2setUrls);
+    setCurrentGroupName(savedCurrentGroupName);
+  }, []);
+
+  
+  /*
+  function saveStates(newGroupName2problems: GroupName2problems = groupName2problems,
+                      newGroupName2setUrls : GroupName2setUrls  = groupName2setUrls,
+                      newCurrentGroupName  : string = currentGroupName) {
+                        */
+  function saveStates({newGroupName2problems = groupName2problems,
+                       newGroupName2setUrls  = groupName2setUrls,
+                       newCurrentGroupName = currentGroupName
+                      }) {
+    /* 新しい状態をstateとローカルストレージに保存する */
+    setGroupName2Problems(newGroupName2problems);
+    setGroupName2setUrls(newGroupName2setUrls);
+    setCurrentGroupName(newCurrentGroupName);
+    setLocalStrage(KEYS.GROUPNAME2PROBLEMS, newGroupName2problems);
+    setLocalStrage(KEYS.GROUPNAME2SETURLS, newGroupName2setUrls);
+    setLocalStrage(KEYS.CURRENTGROUPNAME, newCurrentGroupName);
+  }
 
   function checkAndAlertIfUrlExists(url: string, groupName: string) : boolean {
     if (groupName2setUrls[groupName].has(url)) {
@@ -27,30 +74,27 @@ export default function App() {
       return true;
     }
     return false;
-  } 
+  }
 
   const pileUpProblem = (urlForPiledUp: string, groupNameForPileUp: string = currentGroupName) => {   
     /* もらったグループに、もらったurlを追加する */
     //  Form の submit 関数が走るときに、その入力値を引数としてこの関数が呼ばれるようになってる
     // すでに追加してないか確認（今は戻るようにしてるけど、あとで先頭に追加し直すようにするかも）
     if (checkAndAlertIfUrlExists(urlForPiledUp, groupNameForPileUp))  return;
+    // 今のグループの問題の集合に、今回の問題を追加する
+    groupName2setUrls[groupNameForPileUp].add(urlForPiledUp);
+    groupName2setUrls[allGroupName].add(urlForPiledUp);
+    // イテレータの機能をオンにする必要があったので、問題の集合は変更を検知してrenderしなおす必要がないから上のようにそのまま追加することにした
     // まず、今回追加する単体のProblemを作る
     const problemForPiledUp: Problem = {url: urlForPiledUp};
     // 今のグループの問題のリストに、今回の問題を追加する
     // 今あるオブジェクトを展開し、↓でcurrentGroupNameの部分だけ新しい値をセット(キー名の部分を[]で囲まないと変数名がそのままキーになるので注意)
     // セットする新しい値も、今ある配列を展開して、それに追加する形で今回の問題を後ろにつける
-    setGroupName2Problems({ ...groupName2problems,
-      [groupNameForPileUp]: [ problemForPiledUp, ...groupName2problems[groupNameForPileUp] ],
-      [allGroupName]      : [ problemForPiledUp, ...groupName2problems[allGroupName]]
-    });
-    // 今のグループの問題の集合に、今回の問題を追加する
-    groupName2setUrls[groupNameForPileUp].add(urlForPiledUp);
-    groupName2setUrls[allGroupName].add(urlForPiledUp);
-    setGroupName2setUrls(groupName2setUrls);
-    /*  イテレータの機能をオンにする必要があったので、問題の集合は変更を検知してrenderしなおす必要がないから上のようにそのまま追加することにした
-    setGroupName2setProblems({ ...groupName2setProblems,
-      [currentGroupName]: new Set([ ...groupName2setProblems[currentGroupName], problemForPiledUp ])})
-    */
+    saveStates({newGroupName2problems: { ...groupName2problems,
+                                        [groupNameForPileUp]: [ problemForPiledUp, ...groupName2problems[groupNameForPileUp] ],
+                                        [allGroupName]      : [ problemForPiledUp, ...groupName2problems[allGroupName]]
+                                       },
+                newGroupName2setUrls:  groupName2setUrls});
   }
 
   const solveProblem = (urlForSolve: string, groupNameForSolve: string) => {
@@ -66,36 +110,32 @@ export default function App() {
     groupName2setUrls[groupNameForSolve].delete(urlForSolve);
     groupName2setUrls[allGroupName].delete(urlForSolve);
     groupName2setUrls[solvedGroupName].add(urlForSolve);
-    setGroupName2setUrls(groupName2setUrls);
     // 問題のリストに関して、それぞれを消去・追加し更新する
     const problemForSolve: Problem = {url: urlForSolve};
-    setGroupName2Problems({ ...groupName2problems, 
-      [groupNameForSolve] : groupName2problems[groupNameForSolve].filter((problem, index) => (problem.url !== urlForSolve)),
-      [allGroupName]      : groupName2problems[allGroupName].filter((problem, index) => (problem.url !== urlForSolve)),
-      [solvedGroupName]   : [ problemForSolve, ...groupName2problems[solvedGroupName] ]
-    });
+    saveStates({newGroupName2problems: { ...groupName2problems, 
+                                         [groupNameForSolve] : groupName2problems[groupNameForSolve].filter((problem, index) => (problem.url !== urlForSolve)),
+                                         [allGroupName]      :      groupName2problems[allGroupName].filter((problem, index) => (problem.url !== urlForSolve)),
+                                         [solvedGroupName]   : [ problemForSolve, ...groupName2problems[solvedGroupName] ]
+                                        },
+                newGroupName2setUrls:  groupName2setUrls});
   }
 
   const laterProblem = (urlForLater: string, groupNameForLater: string) => {
     /* 指定したurlを、そのグループ内での末尾に移動 */
     const problemForLater: Problem = {url: urlForLater};
-    setGroupName2Problems({ ...groupName2problems,
-      [groupNameForLater]: [ ...groupName2problems[groupNameForLater].filter((problem, _) => (problem.url !== urlForLater)), problemForLater ]
-    });
+    saveStates({newGroupName2problems: { ...groupName2problems,
+                                         [groupNameForLater]: [ ...groupName2problems[groupNameForLater].filter((problem, _) => (problem.url !== urlForLater)), problemForLater ]}});
   }
 
   const deleteProblem = (urlForDelete: string, groupNameForDelete: string) => {
     /* 引数のurlを、引数のグループの問題から削除する */
-    // まずは引数のグループと全体のグループの、問題リストから削除
-    setGroupName2Problems({ ...groupName2problems,
-      [groupNameForDelete]: groupName2problems[groupNameForDelete].filter((problem, index) => (problem.url !== urlForDelete)),
-            [allGroupName]: groupName2problems[allGroupName].filter((problem, index) => (problem.url !== urlForDelete)),
-    });
-    // 次に引数のグループと全体のグループの、問題の集合から削除
-    groupName2setUrls[groupNameForDelete].delete(urlForDelete);
     // solvedグループでこの関数が呼ばれた時、allGroupには入ってない可能性があるけど、無い要素をdeleteしようとしてもエラーにはならないみたいなので確認はしない今の所
+    groupName2setUrls[groupNameForDelete].delete(urlForDelete);
     groupName2setUrls[allGroupName].delete(urlForDelete);
-    setGroupName2setUrls(groupName2setUrls);
+    saveStates({newGroupName2problems: { ...groupName2problems,
+                                         [groupNameForDelete]: groupName2problems[groupNameForDelete].filter((problem, index) => (problem.url !== urlForDelete)),
+                                               [allGroupName]: groupName2problems[allGroupName].filter((problem, index) => (problem.url !== urlForDelete))},
+                newGroupName2setUrls: groupName2setUrls});
   }
   
   return (
