@@ -1,7 +1,7 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # google authはとりあえず無視 後でするかもしれないからファイル自体は残しとく
-./src/auth/
+./src/auth/google_auth.tsx
 
 .gitignore
 references.txt

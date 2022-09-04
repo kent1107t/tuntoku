@@ -1,4 +1,3 @@
-/* global gapi */
 import { Component, useState } from 'react';
 import * as React from 'react';
 import OverallStructure from './OverallStructure';
@@ -11,6 +10,7 @@ import {initialGroupName, allGroupName, solvedGroupName,
         } from '../save/TypesAndInitialData';
 import {KEYS, setLocalStrage, getLocalStorage, removeLocalStorage, clearLocalStorage} from '../save/LocalStorage';
 
+
 // TODO: AllGroup で削除をしたときにもとの属するグループでも消すかどうか
 
 
@@ -20,41 +20,17 @@ export default function App() {
   const [groupName2problems, setGroupName2Problems] = useState<GroupName2problems>(initialGroupName2Problems);
   // グループ名をキーとして、そのグループの問題の問題の集合を値とした辞書 (ProblemCardでkeyにURLを使ってるので、かぶらないかを確認するのに使ってる)
   const [groupName2setUrls, setGroupName2setUrls] = useState<GroupName2setUrls>(initialGroupName2setUrls);
-  //const [ProblemCards, setProblemCards] = useState<ProblemCards[]>([]);
-  //const [ProblemCardsReal, setProblemCardsReal] = useState<React.FC>(ProblemCards);
 
   console.log(groupName2problems);
 
   React.useEffect(() => {
     // ページをロードした最初に一度だけ呼ばれる ローカルストレージに保存されてる問題を読み込む
     //clearLocalStorage();
-
-    let savedGroupName2problems: GroupName2problems = getLocalStorage(KEYS.GROUPNAME2PROBLEMS),
-        savedGroupName2setUrls : GroupName2setUrls  = getLocalStorage(KEYS.GROUPNAME2SETURLS), 
-        savedCurrentGroupName: string = getLocalStorage(KEYS.CURRENTGROUPNAME);
-    /*
-    console.log("saved  ", savedGroupName2problems);
-    console.log("saved  ", savedGroupName2setUrls);
-    console.log("after  read   groupName2setUrls");
-    for (let [key, value] of Object.entries(savedGroupName2setUrls)) {
-      console.log('key = ', key, '  typeof(key) = ', typeof(key));
-      console.log('value = ', value, '  typeof(value) = ', value);
-    }
-    if (savedGroupName2problems === null)  savedGroupName2problems = initialGroupName2Problems;
-    if (savedGroupName2setUrls === null)   savedGroupName2setUrls  = initialGroupName2setUrls;
-    if (currentGroupName === null)  savedCurrentGroupName = initialGroupName;
-    */
-    setGroupName2Problems(savedGroupName2problems);
-    setGroupName2setUrls(savedGroupName2setUrls);
-    setCurrentGroupName(savedCurrentGroupName);
+    setCurrentGroupName(getLocalStorage(KEYS.CURRENTGROUPNAME));
+    setGroupName2Problems(getLocalStorage(KEYS.GROUPNAME2PROBLEMS));
+    setGroupName2setUrls(getLocalStorage(KEYS.GROUPNAME2SETURLS));
   }, []);
-
   
-  /*
-  function saveStates(newGroupName2problems: GroupName2problems = groupName2problems,
-                      newGroupName2setUrls : GroupName2setUrls  = groupName2setUrls,
-                      newCurrentGroupName  : string = currentGroupName) {
-                        */
   function saveStates({newGroupName2problems = groupName2problems,
                        newGroupName2setUrls  = groupName2setUrls,
                        newCurrentGroupName = currentGroupName
@@ -68,6 +44,7 @@ export default function App() {
     setLocalStrage(KEYS.CURRENTGROUPNAME, newCurrentGroupName);
   }
 
+  
   function checkAndAlertIfUrlExists(url: string, groupName: string) : boolean {
     if (groupName2setUrls[groupName].has(url)) {
       alert('入力されたURLはすでに存在しています!');
@@ -81,7 +58,7 @@ export default function App() {
     //  Form の submit 関数が走るときに、その入力値を引数としてこの関数が呼ばれるようになってる
     // すでに追加してないか確認（今は戻るようにしてるけど、あとで先頭に追加し直すようにするかも）
     if (checkAndAlertIfUrlExists(urlForPiledUp, groupNameForPileUp))  return;
-    // 今のグループの問題の集合に、今回の問題を追加する
+    // 今のグループと全体グループの問題の集合に、今回の問題を追加する
     groupName2setUrls[groupNameForPileUp].add(urlForPiledUp);
     groupName2setUrls[allGroupName].add(urlForPiledUp);
     // イテレータの機能をオンにする必要があったので、問題の集合は変更を検知してrenderしなおす必要がないから上のようにそのまま追加することにした
