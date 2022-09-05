@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 //import CameraIcon from '@mui/icons-material/PhotoCamera';
@@ -10,73 +10,54 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { render } from "@testing-library/react";
 import { Link } from '@mui/material';
-import { MathJax, MathJaxContext } from 'better-react-mathjax';
-
-import TitleAndStatementOfAllProblem from '../scraper/title_and_statement_of_all_problem.json';
 //import { url } from "inspector";
+import { MathJax, MathJaxContext } from 'better-react-mathjax';
+// jsonファイルの読み込み 参考 : https://www.i-ryo.com/entry/2020/11/20/081558
+import TitleAndStatementOfAllProblem from '../scraper/title_and_statement_of_all_problem.json';
+//import TitleAndStatementOfAllProblem from '../scraper/test_title_and_statement_of_all_problem.json';
 
-// 参考 : https://www.i-ryo.com/entry/2020/11/20/081558
 //const titleAndStatementOfAllProblem: {[url: string]: {title: string, problemStatement: string, problemStatementWithTag: string}} = TitleAndStatementOfAllProblem;
 const titleAndStatementOfAllProblem = TitleAndStatementOfAllProblem as  {[url: string]: {title: string, problemStatement: string, problemStatementWithTag: string}};
 
-
-function isUrl(suspect: string) : boolean {
-    // URLかどうかを判定する 参考↓
-    // https://www.megasoft.co.jp/mifes/seiki/s310.html
-    const pattern = new RegExp('https?://[\\w/:%#\\$&\\?\\(\\)~\\.=\\+\\-]+');
-    //if (suspect in titleAndStatementOfAllProblem)  return true;
-    return pattern.test(suspect);
-}
-
-function LinkFormatted(urlOrNot: string) {
-    /* URLであればリンクを有効にして返す */
-    if (urlOrNot in titleAndStatementOfAllProblem)
-        return (
-            <Link href={urlOrNot} color="inherit" underline="hover" target="_blank" rel="noopener noreferrer">
-                {titleAndStatementOfAllProblem[urlOrNot].title}
-            </Link>
-        )
-    else if (isUrl(urlOrNot))
-        return (
-            <Link href={urlOrNot} color="inherit" underline="hover" target="_blank" rel="noopener noreferrer">
-                {urlOrNot}
-            </Link>
-        );
-    else
-        return (
-            <Link tabIndex={-1} color="inherit" underline="hover" target="_blank" rel="noopener noreferrer">
-                {urlOrNot}
-            </Link>
-        );
-}
-
-function DescriptionProblem(urlOrNot: string) {
-    /* 問題のリンクとしてデータがあれば、その問題文を返す */
-    let statement = '問題を特定できませんでした。';
-    /* 例
-    statement = "\\(\\frac{10}{4x} \\approx 2^{12}\\)";  // ok
-    statement = 'XはN以上である。非負整数(a,b)の組であって、\\(X=a^{3}+a^{2}b+ab^{2}+b^{3}を満たすようなものが存在する。'; // ok
-    https://www-npmjs-com.translate.goog/package/better-react-mathjax?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja&_x_tr_pto=op,sc
-    */
-    if (urlOrNot in titleAndStatementOfAllProblem)  statement = titleAndStatementOfAllProblem[urlOrNot].problemStatement
-    return (<Typography component={'span'}><MathJaxContext><MathJax>
-                {statement}
-            </MathJax></MathJaxContext></Typography>);
-}
-
-
-export type Problem = {
-    url: string
-}
+export type Problem = { url: string }
 type Props = { 
     groupName: string
     problems: Problem[]
     handleSolve: (url: string, groupName: string) => void
     handleLater: (url: string, groupName: string) => void
     handleDelete: (url: string, groupName: string) => void
- }
+}
+export function ProblemCards({ problems, groupName, handleSolve, handleLater, handleDelete } : Props) {
+    function isUrl(suspect: string) : boolean {
+        /* URLかどうかを判定する 参考 → https://www.megasoft.co.jp/mifes/seiki/s310.html */
+        return new RegExp('https?://[\\w/:%#\\$&\\?\\(\\)~\\.=\\+\\-]+').test(suspect);
+    }
+    function LinkFormatted(urlOrNot: string) {
+        /* 問題のタイトルが特定できれば表示テキストをそのタイトルにし、また、URLであればリンクを有効にして返す */
+        const displayText: string = !(urlOrNot in titleAndStatementOfAllProblem) ? urlOrNot : titleAndStatementOfAllProblem[urlOrNot].title
+        if (isUrl(urlOrNot))  // 有効にしたリンクを返す
+            return <Link href={urlOrNot} color="inherit" underline="hover" target="_blank" rel="noopener noreferrer"> {displayText} </Link>
+        else                  // 無効化したリンクを返す
+            return <Link tabIndex={-1} color="inherit" underline="hover" rel="noopener noreferrer"> {displayText} </Link>;
+    }
 
-export const ProblemCards: React.FC<Props> = ({ problems, groupName, handleSolve, handleLater, handleDelete }) => {
+    function DescriptionProblem(urlOrNot: string) {
+        /* 問題のリンクとしてデータがあれば、その問題文を返す */
+        /* 例
+        statement = "\\(\\frac{10}{4x} \\approx 2^{12}\\)";  // ok
+        statement = 'XはN以上である。非負整数(a,b)の組であって、\\(X=a^{3}+a^{2}b+ab^{2}+b^{3}を満たすようなものが存在する。'; // ok
+        https://www-npmjs-com.translate.goog/package/better-react-mathjax?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja&_x_tr_pto=op,sc
+        */
+        if (!(urlOrNot in titleAndStatementOfAllProblem))  return <Typography component={'span'}>問題を特定できませんでした。</Typography>
+        return (<Typography component={'span'}>{TextInFormula(titleAndStatementOfAllProblem[urlOrNot].problemStatement)}</Typography>);
+    }
+    function TextInFormula(text: string) {
+        /* 数式表示にして返す */
+        return <MathJaxContext><MathJax>
+            {text}
+        </MathJax></MathJaxContext>
+    }
+
     return (
         <Container sx={{ py: 8 }} maxWidth="md">
             {/* End hero unit */}

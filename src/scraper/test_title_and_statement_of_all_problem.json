@@ -1,0 +1,12 @@
+{
+    "https://atcoder.jp/contests/abc176/tasks/abc176_e": {
+        "title": "E - Bomber",
+        "problemStatement": "H \\times Wマスの二次元グリッドがあります。この中にはM個の爆破対象があります。i個目の爆破対象の位置は\\left(h_i, w_i \\right)です。高橋君は1つのマスを選び、そのマスに爆弾を設置し、起爆します。爆弾と同じ行または同じ列に存在する爆破対象が爆破されます。爆破対象が存在するマスに爆弾を設置することも出来ます。高橋君は、爆破する爆破対象の数を最大化しようとしています。最大でいくつの爆破対象を爆破出来るか答えてください。",
+        "problemStatementWithTag": "<p><var>H \\times W</var> マスの二次元グリッドがあります。この中には <var>M</var> 個の爆破対象があります。 <var>i</var> 個目の爆破対象の位置は <var>\\left(h_i, w_i \\right)</var>です。</p>\n<p>高橋君は <var>1</var> つのマスを選び、そのマスに爆弾を設置し、起爆します。爆弾と同じ行または同じ列に存在する爆破対象が爆破されます。爆破対象が存在するマスに爆弾を設置することも出来ます。</p>\n<p>高橋君は、爆破する爆破対象の数を最大化しようとしています。最大でいくつの爆破対象を爆破出来るか答えてください。</p>\n"
+      },
+    "https://atcoder.jp/contests/joisc2007/tasks/joisc2007_score": {
+        "title": "score - 得点 (Score)",
+        "problemStatement": "",
+        "problemStatementWithTag": ""
+    }
+}

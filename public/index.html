@@ -2,7 +2,9 @@
 <html lang="ja">
   <head>
     <meta charset="utf-8" />
+    <!--
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    -->
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
     <meta
@@ -12,9 +14,6 @@
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
 
     <!-- 
-      material-uiを使うためのlink ↓参考
-      https://mui.com/material-ui/getting-started/installation/
-     -->
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
@@ -23,6 +22,7 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/icon?family=Material+Icons"
     />
+     -->
     <!--
       manifest.json provides metadata used when your web app is installed on a
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
@@ -37,42 +37,19 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
-    <title>Title</title>
+    <title>tuntoku</title>
     <!-- 認証用のメタタグ -->
     <meta name="google-site-verification" content="KuIgB5dfiXXa3_sEj0R1dv5mAz7uPMOXS1Ey_0arhNI" />
-    <!-- APIを使うためのスクリプト -->
-    <script src="https://apis.google.com/js/platform.js"></script>
-    <script src="https://apis.google.com/js/api.js"></script> 
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-AMS_CHTML"></script>
-    <!-- 数式を表示させるためのInstllation -->
-    <!---->
-		<link rel="stylesheet" href="//img.atcoder.jp/public/c9fb8bb/css/cdn/katex.min.css">
-		<script defer src="//img.atcoder.jp/public/c9fb8bb/js/cdn/katex.min.js"></script>
-		<script defer src="//img.atcoder.jp/public/c9fb8bb/js/cdn/auto-render.min.js"></script>
     
+    <!-- APIを使うためのスクリプト 
+    <script src="https://apis.google.com/js/platform.js"></script>
+    <script src="https://apis.google.com/js/api.js"></script>
+    
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-AMS_CHTML"></script>
+    -->
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
-
-    <script>$(function(){$('var').each(function(){var html=$(this).html().replace(/<sub>/g,'_{').replace(/<\/sub>/g,'}');$(this).html('\\('+html+'\\)');});});</script>
-    <script>
-      var katexOptions = {
-        delimiters: [
-          {left: "$$", right: "$$", display: true},
-          {left: "\\[", right: "\\]", display: true},
-          {left: "\\(", right: "\\)", display: false}
-        ],
-        ignoredTags: [
-          "script",
-          "noscript",
-          "style",
-          "textarea",
-          "pre",
-          "code"
-        ]
-      };
-      document.addEventListener("DOMContentLoaded", function() { renderMathInElement(document.body, katexOptions);});
-    </script>
   </body>
 </html>
