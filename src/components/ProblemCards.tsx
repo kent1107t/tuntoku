@@ -9,12 +9,16 @@ import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { render } from "@testing-library/react";
-import { Link } from "@mui/material";
+import { Link } from '@mui/material';
+import { MathJax, MathJaxContext } from 'better-react-mathjax';
+
 import TitleAndStatementOfAllProblem from '../scraper/title_and_statement_of_all_problem.json';
 //import { url } from "inspector";
 
 // 参考 : https://www.i-ryo.com/entry/2020/11/20/081558
-const titleAndStatementOfAllProblem: {[url: string]: {title: string, problemStatement: string}} = TitleAndStatementOfAllProblem;
+//const titleAndStatementOfAllProblem: {[url: string]: {title: string, problemStatement: string, problemStatementWithTag: string}} = TitleAndStatementOfAllProblem;
+const titleAndStatementOfAllProblem = TitleAndStatementOfAllProblem as  {[url: string]: {title: string, problemStatement: string, problemStatementWithTag: string}};
+
 
 function isUrl(suspect: string) : boolean {
     // URLかどうかを判定する 参考↓
@@ -48,14 +52,16 @@ function LinkFormatted(urlOrNot: string) {
 
 function DescriptionProblem(urlOrNot: string) {
     /* 問題のリンクとしてデータがあれば、その問題文を返す */
-    if (urlOrNot in titleAndStatementOfAllProblem)
-        return (<Typography>
-            {titleAndStatementOfAllProblem[urlOrNot].problemStatement}
-            </Typography>);
-    else
-        return (<Typography>
-            問題のURLは見つかりませんでした
-        </Typography>);
+    let statement = '問題を特定できませんでした。';
+    /* 例
+    statement = "\\(\\frac{10}{4x} \\approx 2^{12}\\)";  // ok
+    statement = 'XはN以上である。非負整数(a,b)の組であって、\\(X=a^{3}+a^{2}b+ab^{2}+b^{3}を満たすようなものが存在する。'; // ok
+    https://www-npmjs-com.translate.goog/package/better-react-mathjax?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja&_x_tr_pto=op,sc
+    */
+    if (urlOrNot in titleAndStatementOfAllProblem)  statement = titleAndStatementOfAllProblem[urlOrNot].problemStatement
+    return (<Typography component={'span'}><MathJaxContext><MathJax>
+                {statement}
+            </MathJax></MathJaxContext></Typography>);
 }
 
 

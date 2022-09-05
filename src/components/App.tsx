@@ -23,6 +23,7 @@ export default function App() {
 
   console.log(groupName2problems);
 
+
   React.useEffect(() => {
     // ページをロードした最初に一度だけ呼ばれる ローカルストレージに保存されてる問題を読み込む
     //clearLocalStorage();
@@ -30,7 +31,7 @@ export default function App() {
     setGroupName2Problems(getLocalStorage(KEYS.GROUPNAME2PROBLEMS));
     setGroupName2setUrls(getLocalStorage(KEYS.GROUPNAME2SETURLS));
   }, []);
-  
+
   function saveStates({newGroupName2problems = groupName2problems,
                        newGroupName2setUrls  = groupName2setUrls,
                        newCurrentGroupName = currentGroupName
@@ -44,7 +45,6 @@ export default function App() {
     setLocalStrage(KEYS.CURRENTGROUPNAME, newCurrentGroupName);
   }
 
-  
   function checkAndAlertIfUrlExists(url: string, groupName: string) : boolean {
     if (groupName2setUrls[groupName].has(url)) {
       alert('入力されたURLはすでに存在しています!');

@@ -3,6 +3,7 @@ from time import sleep
 import json
 from turtle import update
 from urllib import request
+import requests
 from urllib.parse import urljoin
 from bs4 import BeautifulSoup
 
@@ -11,7 +12,7 @@ fp_url_of_all_problem = 'url_of_all_problem.json'
 fp_title_and_statement_of_all_problem = 'title_and_statement_of_all_problem.json'
 
 root_url = 'https://atcoder.jp'
-crawl_delay = 1
+crawl_delay = 1.4
 
 def get_title_and_problem_statement_from_problem_url(problem_url):
     ''' 個別の問題のページから、その問題のタイトルと問題文を辞書にして返す '''
@@ -20,36 +21,45 @@ def get_title_and_problem_statement_from_problem_url(problem_url):
     # タイトル
     info['title'] = soup.find('title').text
     # 問題文（一個目のh3と並んで入ってる）
+    problem_statement, problem_statement_with_tag = '', ''
     try:
+        problem_statement_with_tag = ''
+        for nxt in soup.find('h3', text='問題文').next_siblings: # h3タグより後の全兄弟についてまわる
+            problem_statement_with_tag += str(nxt)  # タグごといれる
         problem_statement = soup.find('h3', text='問題文').parent.get_text(strip=True)
         problem_statement = problem_statement[3:]  # 最初に"問題文"の三文字が入ってるのでそれを除く
     except:  problem_statement = ''  # AHC とかだと問題分が空でこうなることがある
     info['problemStatement'] = problem_statement
+    info['problemStatementWithTag'] = problem_statement_with_tag
     return info
 
 def get_problem_urls_from_contest_url(contest_url):
     ''' 個別の問題のURLをリストで返す (対象のコンテストのURLは引数でもらったもの) '''
-    html = request.urlopen(f'{contest_url}/tasks')
+    try:  html = request.urlopen(f'{contest_url}/tasks')
+    except:  return []
     table_body_elem = BeautifulSoup(html, 'html.parser').find('table').find('tbody')
     return [f"{root_url}{tr_elem.find('a').get('href')}" for tr_elem in table_body_elem.find_all('tr')]
 
 def get_all_contest_urls():
     ''' 過去コンテスト一覧のページを見ていって、全コンテストのURLをリストで返す '''
-    base_url_show_past_contest = f'{root_url}/contests/archive?page='
+    base_url_show_past_contest = f'{root_url}/contests/archive?lang=ja&page='
     page_count = 1
     all_contest_urls = []
     while page_count <= 60 * 3:
         print(f'page = {page_count}  in get_all_contest_urls')
         url_show_past_contest = f'{base_url_show_past_contest}{page_count}'
+        print(url_show_past_contest)
+        
         html = request.urlopen(url_show_past_contest)
+        #r = requests.get(url_show_past_contest)
         # コンテスト一覧が載ってるテーブル要素（想定は一つだけ）
         table_elems = BeautifulSoup(html, 'html.parser').find_all('table')
         if len(table_elems) == 0:  break  # なければ終了
         # コンテストの左にあるカレンダー？のリンクもヒットするのでフィルターかける（そのままだと相対パスになってるのでついでに絶対パスにする）
         contest_urls = [urljoin(root_url, a_elem.get('href')) for a_elem in table_elems[0].find_all('a') if 'contest' in a_elem.get('href')]
         all_contest_urls.extend(contest_urls)
-        page_count += 1
         sleep(crawl_delay)
+        page_count += 1
     return all_contest_urls
 
 
@@ -122,6 +132,7 @@ def update_json_files(ignore_urls_exists_as_key=True):
 
 def main():
     update_json_files()
+
 
 if __name__ == '__main__':
     main()
