@@ -1,3 +1,4 @@
+from cgitb import text
 from operator import mod
 from time import sleep
 import json
@@ -39,6 +40,14 @@ def get_separated_by_var(text):
         cur_begin_index = cur_end_index + len(str(var_elem))
     separated_text.pop(-1) # 番兵を削除
     return separated_text
+
+def avoid_error_formula(text_formula):
+    ''' 問題文で&gt;みたいな表現がされてるところが、react-katexだとエラーになるので、それをエラーが出ないように変える '''
+    ret = text_formula
+    ret = ret.replace('&gt;', ' \\gt ')
+    ret = ret.replace('&lt;', ' \\lt ')
+    ret = ret.replace('&amp;', '&')
+    return ret
 
 def get_title_and_problem_statement_from_problem_url(problem_url):
     ''' 個別の問題のページから、その問題のタイトルと問題文を辞書にして返す '''
@@ -161,16 +170,18 @@ def main():
 
 
 def change_statement(fp):
-    ''' {url:{title:, statement:, statementWithTag:}} でもってるファイル(fp) を、{url:{title:, statement{text:, isFormula:}}}で持つように変える '''
+    ''' {url:{title:, statement{text:, isFormula:}}} で持ってるファイルの、数式表記の一部変更などに使う '''
     with open(fp, mode='r') as f: title_and_statement_of_all_problem = json.load(f)
-
     new_title_and_statement_of_all_problem = {}
-    for url, t_and_s in title_and_statement_of_all_problem.items():
-        new_title_and_statement_of_all_problem[url] = {'title': t_and_s['title'], 'problemStatement': get_separated_by_var(t_and_s['problemStatementWithTag'])}
 
+    for url, t_states in title_and_statement_of_all_problem.items():
+        new_title_and_statement_of_all_problem[url] = {'title': t_states['title'], 'problemStatement': []}
+        for t_and_is in t_states['problemStatement']:
+            new_text = t_and_is['text'] if not t_and_is['isFormula'] else avoid_error_formula(t_and_is['text'])
+            new_title_and_statement_of_all_problem[url]['problemStatement'].append({'text': new_text, 'isFormula': t_and_is['isFormula']})
+    
     with open(fp, mode='w') as f:
         json.dump(new_title_and_statement_of_all_problem, f, ensure_ascii=False, indent=2)
-    
 
 
 if __name__ == '__main__':

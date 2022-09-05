@@ -45,10 +45,11 @@ function DescriptionProblem(urlOrNot: string) {
 function getTextWithFormula(url: string, problemStatement: ProblemStatement) {
     /* 数式の部分かどうかで分けた文章のグループの配列を、それぞれ数式部分は数式表示にして返す */
     // ここの値自体が変わることはない（問題文のなので）からどこを再renderするかのためのkeyはなくても困ることは無いはずだけど、一応つけておく
+    // 参考 : https://qiita.com/koba04/items/a4d23245d246c53cd49d
     return (<Typography component={'span'}>
             {problemStatement.map(({text, isFormula}, index) => (
                 isFormula ? <InlineMath key={url+index}>{text}</InlineMath> : <span key={url+index}>{text}</span>
-            ))}
+                ))}
            </Typography>
     );
 }
