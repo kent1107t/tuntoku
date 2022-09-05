@@ -14,6 +14,32 @@ fp_title_and_statement_of_all_problem = 'title_and_statement_of_all_problem.json
 root_url = 'https://atcoder.jp'
 crawl_delay = 1.4
 
+def get_separated_by_var(text):
+    ''' タグ付きのhtml文字列をもらって、それを数式の部分で区切り、[{text:生文字列, isFormula:数式かどうか}] の配列で返す '''
+    for word4del in ['\n', '\r']:  text = text.replace(word4del, '')
+    text += '<var></var>' # 番兵
+    separated_text = []
+    soup = BeautifulSoup(text, 'html.parser')
+    cur_begin_index = 0
+    for var_elem in soup.find_all('var'):
+        # <var> ~ </var> の文字列が始まるインデックスを取得
+        cur_end_index = cur_begin_index + text[cur_begin_index:].find(str(var_elem))
+        # その<var>で始まるところ未満までが、数式じゃない文字列 (タグを消した文字列を得るためにsoupを利用してる)
+        not_formula_elems = BeautifulSoup(text[cur_begin_index:cur_end_index], 'html.parser')
+        not_formula_text = not_formula_elems.text.strip() # 空文字削除
+        # 数式じゃない文字列をいれてく
+        # 同じ文字のとこで要素がかぶってるとこが重複して入ることあったからやめた→タグがちゃんと囲まれて<var>で区切られることがほぼないからあんまり機能してないけど、一応要素ごとに分けるようにしてる
+        if not_formula_text != '':
+            text_and_isFormula = {'text': not_formula_text, 'isFormula': False}
+            separated_text.append(text_and_isFormula)
+        # 今回みつけた数式を入れる(タグのみを除いた状態で、じゃないと数式のための表記がきえちゃう)
+        text_and_isFormula = {'text': str(var_elem)[5:-6], 'isFormula': True}
+        separated_text.append(text_and_isFormula)
+        # 今回みつけた数式の文字列の終わりの位置の一つ先を次の開始位置としてセット
+        cur_begin_index = cur_end_index + len(str(var_elem))
+    separated_text.pop(-1) # 番兵を削除
+    return separated_text
+
 def get_title_and_problem_statement_from_problem_url(problem_url):
     ''' 個別の問題のページから、その問題のタイトルと問題文を辞書にして返す '''
     info = {}
@@ -29,8 +55,8 @@ def get_title_and_problem_statement_from_problem_url(problem_url):
         problem_statement = soup.find('h3', text='問題文').parent.get_text(strip=True)
         problem_statement = problem_statement[3:]  # 最初に"問題文"の三文字が入ってるのでそれを除く
     except:  problem_statement = ''  # AHC とかだと問題分が空でこうなることがある
-    info['problemStatement'] = problem_statement
-    info['problemStatementWithTag'] = problem_statement_with_tag
+    #info['problemStatement'] = problem_statement
+    info['problemStatementWithTag'] = get_separated_by_var(problem_statement_with_tag)
     return info
 
 def get_problem_urls_from_contest_url(contest_url):
@@ -132,6 +158,19 @@ def update_json_files(ignore_urls_exists_as_key=True):
 
 def main():
     update_json_files()
+
+
+def change_statement(fp):
+    ''' {url:{title:, statement:, statementWithTag:}} でもってるファイル(fp) を、{url:{title:, statement{text:, isFormula:}}}で持つように変える '''
+    with open(fp, mode='r') as f: title_and_statement_of_all_problem = json.load(f)
+
+    new_title_and_statement_of_all_problem = {}
+    for url, t_and_s in title_and_statement_of_all_problem.items():
+        new_title_and_statement_of_all_problem[url] = {'title': t_and_s['title'], 'problemStatement': get_separated_by_var(t_and_s['problemStatementWithTag'])}
+
+    with open(fp, mode='w') as f:
+        json.dump(new_title_and_statement_of_all_problem, f, ensure_ascii=False, indent=2)
+    
 
 
 if __name__ == '__main__':
