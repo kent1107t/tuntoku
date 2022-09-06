@@ -17,30 +17,28 @@ function OverallStructure(madeForm: React.ReactNode, madeProblemCards: React.Rea
             <CssBaseline />
             <BarTitle />
             <main>
-            {/* 本体のところ Hero unit */}
-            <Box
-                sx={{
-                bgcolor: 'background.paper',
-                pt: 8,
-                pb: 6,
-                }}
-            >
-                <Container maxWidth="sm">
-                {/* 表紙みたいなところ */}
-                {/* 
-                <TextPrimary />
-                */}
-                <TextSecondary />
-                {/* 入力フォーム 
-                */}
-                {madeForm}
+                <Container component='main' maxWidth='md'>
+                    {/* 本体のところ Hero unit */}
+                    <Box
+                        sx={{
+                            bgcolor: 'background.paper',
+                            pt: 2,
+                            width: 1
+                        }}
+                    >
+                        <Container maxWidth="lg">
+                            {/* 表紙みたいなところ */}
+                            {/* <TextPrimary /> */}
+                            <TextSecondary />
+                            {/* 入力フォーム */}
+                            {madeForm}
+                        </Container>
+                    </Box>
                 </Container>
-            </Box>
-            
-            {/* 問題のカードたち */}
-            {/*<ProblemCards groupName={currentGroupName} problems={groupName2problems[currentGroupName]} handleRemove={removeProblem} />
-            */}
-            {madeProblemCards}
+                {/* 問題のカードたち */}
+                {/*<ProblemCards groupName={currentGroupName} problems={groupName2problems[currentGroupName]} handleRemove={removeProblem} />
+                */}
+                {madeProblemCards}
             </main>
             {/* Footer */}
             <Footer />
@@ -80,7 +78,7 @@ function TextPrimary() {
 }
 function TextSecondary() {
     return (
-    <Typography variant="h5" align="center" color="text.secondary" paragraph>
+    <Typography variant="h6" align="center" color="text.secondary" paragraph>
         URLを入力してエンターを押すと、その問題を積んでおきます。
     </Typography>
     );

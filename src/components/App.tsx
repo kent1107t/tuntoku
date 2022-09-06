@@ -53,7 +53,7 @@ export default function App() {
     return false;
   }
 
-  const pileUpProblem = (urlForPiledUp: string, groupNameForPileUp: string = currentGroupName) => {   
+  const pileUpProblem = (urlForPiledUp: string, isUpperPosForPiledUp: boolean, groupNameForPileUp: string = currentGroupName) => {   
     /* もらったグループに、もらったurlを追加する */
     //  Form の submit 関数が走るときに、その入力値を引数としてこの関数が呼ばれるようになってる
     // すでに追加してないか確認（今は戻るようにしてるけど、あとで先頭に追加し直すようにするかも）
@@ -67,9 +67,9 @@ export default function App() {
     // 今のグループの問題のリストに、今回の問題を追加する
     // 今あるオブジェクトを展開し、↓でcurrentGroupNameの部分だけ新しい値をセット(キー名の部分を[]で囲まないと変数名がそのままキーになるので注意)
     // セットする新しい値も、今ある配列を展開して、それに追加する形で今回の問題を後ろにつける
-    saveStates({newGroupName2problems: { ...groupName2problems,
-                                        [groupNameForPileUp]: [ problemForPiledUp, ...groupName2problems[groupNameForPileUp] ],
-                                        [allGroupName]      : [ problemForPiledUp, ...groupName2problems[allGroupName]]
+    saveStates({newGroupName2problems: { ...groupName2problems, // ↓どっちの位置に積むかで今回の問題の位置の先頭か後方かを変えてる
+                                          [groupNameForPileUp]: isUpperPosForPiledUp ? [ problemForPiledUp, ...groupName2problems[groupNameForPileUp] ] : [ ...groupName2problems[groupNameForPileUp], problemForPiledUp ],
+                                          [allGroupName]      : isUpperPosForPiledUp ? [ problemForPiledUp, ...groupName2problems[allGroupName] ]       : [ ...groupName2problems[allGroupName], problemForPiledUp ],
                                        },
                 newGroupName2setUrls:  groupName2setUrls});
   }

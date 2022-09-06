@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/tuntoku/static/css/main.dc773140.css",
-    "main.js": "/tuntoku/static/js/main.441234bd.js",
+    "main.js": "/tuntoku/static/js/main.aa0c705a.js",
     "static/js/787.027aface.chunk.js": "/tuntoku/static/js/787.027aface.chunk.js",
     "static/media/KaTeX_AMS-Regular.ttf": "/tuntoku/static/media/KaTeX_AMS-Regular.853be92419a6c3766b9a.ttf",
     "static/media/KaTeX_Main-Regular.ttf": "/tuntoku/static/media/KaTeX_Main-Regular.9eba1d77abcf2aa6e94e.ttf",
@@ -65,11 +65,11 @@
     "static/media/KaTeX_Size3-Regular.woff2": "/tuntoku/static/media/KaTeX_Size3-Regular.e1951519f6f0596f7356.woff2",
     "index.html": "/tuntoku/index.html",
     "main.dc773140.css.map": "/tuntoku/static/css/main.dc773140.css.map",
-    "main.441234bd.js.map": "/tuntoku/static/js/main.441234bd.js.map",
+    "main.aa0c705a.js.map": "/tuntoku/static/js/main.aa0c705a.js.map",
     "787.027aface.chunk.js.map": "/tuntoku/static/js/787.027aface.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.dc773140.css",
-    "static/js/main.441234bd.js"
+    "static/js/main.aa0c705a.js"
   ]
 }
